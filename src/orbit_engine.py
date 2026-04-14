@@ -39,3 +39,20 @@ def _position_eci(radius_m,
     z = z_n
 
     return (x, y, z)
+
+def _in_cylindrical_eclipse(position_m, sun_unit_vector, earth_radius_m):
+    """
+    Returns True if the satellite position is inside Earth's cylindrical shadow.
+    """
+    px, py, pz = position_m
+    sx, sy, sz = sun_unit_vector
+
+    projection_onto_sun_axis = px*sx + py*sy + pz*sz
+    if projection_onto_sun_axis >= 0.0:
+        return False          # satellite is on the sunlit side of Earth
+
+    position_magnitude_sq    = px*px + py*py + pz*pz
+    perpendicular_distance_sq = position_magnitude_sq - projection_onto_sun_axis * projection_onto_sun_axis
+    earth_radius_sq = earth_radius_m * earth_radius_m
+
+    return perpendicular_distance_sq < earth_radius_sq

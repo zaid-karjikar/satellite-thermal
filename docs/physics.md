@@ -138,3 +138,45 @@ $$|\vec{r}_{ECI}| = r \quad \text{for all } t$$
 | Circular orbit ($e = 0$) | Elliptical orbits require true anomaly computed from Kepler's equation, not $\nu_0 + nt$ |
 | Two-body gravity | Ignores $J_2$ oblateness, drag, and third-body perturbations; orbital plane drifts over days to weeks |
 | Inertial frame | ECI is not truly inertial over long runs due to precession; negligible for thermal simulations |
+
+### 3.3. Eclipse Model
+
+#### Cylindrical shadow model
+
+The satellite is in eclipse when Earth blocks sunlight.
+The true shadow is a cone, but because the Sun is $1.496 \times 10^8$ km away,
+its rays are nearly parallel and the cone is well approximated by a cylinder of radius $R_\oplus$.
+This avoids the penumbra calculation and is accurate to better than 0.1% for low-Earth orbits.
+
+#### Geometry
+
+Let $\vec{p}$ be the satellite position in ECI and $\hat{s}$ the sun unit vector.
+Decompose $\vec{p}$ into components parallel and perpendicular to $\hat{s}$:
+
+$$p_\parallel = \vec{p} \cdot \hat{s}$$
+
+$$p_\perp = \sqrt{|\vec{p}|^2 - p_\parallel^2}$$
+
+The satellite is in eclipse if and only if both conditions hold:
+
+$$p_\parallel < 0 \quad \text{(behind Earth)}$$
+
+$$p_\perp < R_\oplus \quad \text{(inside the cylinder)}$$
+
+#### Implementation note
+
+The perpendicular distance is compared in squared form to avoid a square root:
+
+$$p_\perp^2 = |\vec{p}|^2 - p_\parallel^2 < R_\oplus^2$$
+
+#### Assumption and limitation
+
+The cylindrical model ignores the penumbra. The partial shadow at the cylinder boundary
+is treated as a hard edge. For thermal analysis this is conservative: the satellite transitions
+from full solar flux to zero instantaneously.
+
+The cylinder overestimates the true shadow width by approximately
+$d \times \tan(0.265°) \approx 0.005 \times d$ metres, where $d$ is the distance behind Earth and $0.265°$ is the Sun's angular radius as seen from Earth.
+This error grows continuously with altitude and has no sharp threshold.
+For most LEO missions the overestimate is negligible; for higher orbits the conical geometry
+should be evaluated against mission accuracy requirements.
