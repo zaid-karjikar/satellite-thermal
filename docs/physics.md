@@ -60,3 +60,81 @@ The Sun moves approximately $360° / 365.25 \approx 0.986°$ per day relative to
 For runs longer than a few days, $\hat{s}$ should be updated at each timestep using an ephemeris.
 
 The default `raan=0, declination=0` places the Sun on the $+x$ axis (at the vernal equinox), corresponding approximately to the March equinox. This is a convenient reference point for tests but is only physically accurate for simulations starting around that date.
+
+### 3.2 Satellite position in ECI
+
+The satellite is assumed to follow a **circular orbit** of constant radius $r$.
+Position is computed from five orbital elements plus time.
+
+#### Orbital elements
+
+| Symbol | Parameter | Unit |
+|--------|-----------|------|
+| $r$ | Orbital radius (Earth centre to satellite) | m |
+| $i$ | Inclination — tilt of orbital plane from equator | rad |
+| $\Omega$ | RAAN — where the orbit crosses the equator | rad |
+| $\nu_0$ | True anomaly at $t = 0$ | rad |
+| $n$ | Mean motion — angular speed around orbit | rad s⁻¹ |
+
+#### Derivation
+
+The transformation from orbital elements to ECI is a three-step rotation.
+
+**Step 1 — position in the orbital plane.**
+For a circular orbit the satellite sweeps angle $\nu$ at constant rate $n$:
+
+$$\nu(t) = \nu_0 + n \cdot t$$
+
+In its own plane the orbit is flat 2D circular motion:
+
+$$\vec{r}_p = (r\cos\nu,\ r\sin\nu,\ 0)$$
+
+**Step 2 — tilt by inclination.**
+The orbital plane is tilted relative to the equator by inclination $i$.
+This is a rotation around the $x$-axis:
+
+$$R_x(i) = \begin{pmatrix} 1 & 0 & 0 \\ 0 & \cos i & -\sin i \\ 0 & \sin i & \cos i \end{pmatrix}$$
+
+Since $z_p = 0$ this simplifies to:
+
+$$\vec{r}_n = (r\cos\nu,\ r\sin\nu\cos i,\ r\sin\nu\sin i)$$
+
+For an orbit with $i = 51.6°$ (ISS), the satellite reaches latitudes of $\pm 51.6°$.
+
+**Step 3 — rotate by RAAN.**
+RAAN $\Omega$ rotates the orbital plane around the $z$-axis, setting where the orbit
+crosses the equator relative to the vernal equinox.
+This is a rotation around the $z$-axis:
+
+$$R_z(\Omega) = \begin{pmatrix} \cos\Omega & -\sin\Omega & 0 \\ \sin\Omega & \cos\Omega & 0 \\ 0 & 0 & 1 \end{pmatrix}$$
+
+$z$ is unchanged because the rotation axis is $z$.
+
+**Combined transformation.**
+The full rotation from orbital plane to ECI is:
+
+$$\vec{r}_{ECI} = R_z(\Omega) \cdot R_x(i) \cdot \vec{r}_p$$
+
+Expanding:
+
+$$\vec{r}_{ECI} = \begin{pmatrix}
+r\cos\nu\cos\Omega - r\sin\nu\cos i\sin\Omega \\
+r\cos\nu\sin\Omega + r\sin\nu\cos i\cos\Omega \\
+r\sin\nu\sin i
+\end{pmatrix}$$
+
+#### Magnitude check
+
+Rotations preserve vector length, so the orbital radius must remain constant for all $t$:
+
+$$|\vec{r}_{ECI}|^2 = x^2 + y^2 + z^2 = r^2(\cos^2\nu + \sin^2\nu) = r^2$$
+
+$$|\vec{r}_{ECI}| = r \quad \text{for all } t$$
+
+#### Assumptions and limitations
+
+| Assumption | Effect if violated |
+|------------|-------------------|
+| Circular orbit ($e = 0$) | Elliptical orbits require true anomaly computed from Kepler's equation, not $\nu_0 + nt$ |
+| Two-body gravity | Ignores $J_2$ oblateness, drag, and third-body perturbations; orbital plane drifts over days to weeks |
+| Inertial frame | ECI is not truly inertial over long runs due to precession; negligible for thermal simulations |
