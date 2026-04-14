@@ -1,5 +1,5 @@
 from math import cos, sin, sqrt, pi, radians
-from src.constants import EARTH_RADIUS_KM, EARTH_MU_KM3_S2
+from src.constants import EARTH_MU_M3_S2, EARTH_RADIUS_M
 
 def _sun_unit_vector(raan_rad, declination_rad):
     """
@@ -40,7 +40,7 @@ def _position_eci(radius_m,
 
     return (x, y, z)
 
-def _in_cylindrical_eclipse(position_m, sun_unit_vector, earth_radius_m):
+def _in_cylindrical_eclipse(position_m, sun_unit_vector):
     """
     Returns True if the satellite position is inside Earth's cylindrical shadow.
     """
@@ -49,10 +49,10 @@ def _in_cylindrical_eclipse(position_m, sun_unit_vector, earth_radius_m):
 
     projection_onto_sun_axis = px*sx + py*sy + pz*sz
     if projection_onto_sun_axis >= 0.0:
-        return False          # satellite is on the sunlit side of Earth
+        return False          # satellite is not behind Earth (sunlit or on the terminator plane)
 
     position_magnitude_sq    = px*px + py*py + pz*pz
     perpendicular_distance_sq = position_magnitude_sq - projection_onto_sun_axis * projection_onto_sun_axis
-    earth_radius_sq = earth_radius_m * earth_radius_m
+    earth_radius_sq = EARTH_RADIUS_M * EARTH_RADIUS_M
 
     return perpendicular_distance_sq < earth_radius_sq
