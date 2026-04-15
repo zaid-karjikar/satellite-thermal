@@ -26,6 +26,8 @@ This is the standard first-order approach used in early CubeSat thermal trade st
 **Integration**
 - Forward Euler, fixed time step
 
+Full equations and derivations live in `docs/physics.md`
+
 ## What it does *not* model
 The current version does not handle:
 

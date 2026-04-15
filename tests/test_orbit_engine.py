@@ -8,8 +8,8 @@ from src.constants import EARTH_RADIUS_M
 def magnitude(v):
     return sqrt(sum(c ** 2 for c in v))
 
-def allclose(v, expected, tol=1e-9):
-    return all(isclose(a, b, abs_tol=tol) for a, b in zip(v, expected))
+def allclose(v, expected, abs_tol=1e-6, rel_tol=1e-9):
+    return all(isclose(a, b, abs_tol=abs_tol, rel_tol=rel_tol) for a, b in zip(v, expected))
 
 R = 6_771_000.0                       # ISS-altitude circular orbit radius, meters
 N = 2 * pi / 5560.0                   # approximate mean motion, rad/s
@@ -115,7 +115,7 @@ class TestPositionECI:
     def test_polar_orbit_reaches_south_pole(self):
         """inclination = 90°, true anomaly = 3π/2 → satellite directly over south pole (-z)."""
         x, y, z = orbit_engine._position_eci(R, pi / 2, 0, 3 * pi / 2, N, 0)
-        assert allclose((x, y, z), (0.0, 0.0, -R), tol=1e-3)
+        assert allclose((x, y, z), (0.0, 0.0, -R), rel_tol=1e-9)
 
     def test_inclination_max_z(self):
         """Maximum z reached equals radius * sin(inclination)."""

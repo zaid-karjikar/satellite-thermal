@@ -139,7 +139,7 @@ $$|\vec{r}_{ECI}| = r \quad \text{for all } t$$
 | Two-body gravity | Ignores $J_2$ oblateness, drag, and third-body perturbations; orbital plane drifts over days to weeks |
 | Inertial frame | ECI is not truly inertial over long runs due to precession; negligible for thermal simulations |
 
-### 3.3. Eclipse Model
+### 3.3 Eclipse Model
 
 #### Cylindrical shadow model
 
