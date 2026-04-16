@@ -56,3 +56,30 @@ def _in_cylindrical_eclipse(position_m, sun_unit_vector):
     earth_radius_sq = EARTH_RADIUS_M * EARTH_RADIUS_M
 
     return perpendicular_distance_sq < earth_radius_sq
+
+class Orbit:
+    """
+    Circular orbit in ECI with a fixed sun direction.
+
+    Accepts altitude and angles in kilometres and degrees.
+    All internal state is in SI units (metres, seconds, radians).
+    """
+    def __init__(self, 
+                 altitude_km, 
+                 inclination_deg, 
+                 raan_deg=0.0, 
+                 true_anomaly_deg=0.0, 
+                 sun_ra_deg=0.0, 
+                 sun_dec_deg=0.0):
+        if altitude_km <= 0:
+            raise ValueError(f"altitude_km must be positive, got {altitude_km}")
+        
+        self.orbital_radius_m   = EARTH_RADIUS_M + altitude_km * 1000
+        self.inclination_rad    = radians(inclination_deg)
+        self.raan_rad           = radians(raan_deg)
+        self.true_anomaly_0_rad = radians(true_anomaly_deg)
+
+        self.orbital_period_s  = 2 * pi * sqrt(self.orbital_radius_m**3 / EARTH_MU_M3_S2)
+        self.mean_motion_rad_s = 2 * pi / self.orbital_period_s
+
+        self.sun_vector = _sun_unit_vector(radians(sun_ra_deg), radians(sun_dec_deg))

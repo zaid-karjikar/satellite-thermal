@@ -180,3 +180,26 @@ $d \times \tan(0.265°) \approx 0.005 \times d$ metres, where $d$ is the distanc
 This error grows continuously with altitude and has no sharp threshold.
 For most LEO missions the overestimate is negligible; for higher orbits the conical geometry
 should be evaluated against mission accuracy requirements.
+
+### 3.4 Orbit
+
+An orbit is fully specified by an altitude $h$ and five angular elements:
+inclination $i$, RAAN $\Omega$, true anomaly at epoch $\nu_0$,
+and the Sun's right ascension $\alpha$ and declination $\delta$.
+
+**Orbital radius**
+
+$$r = R_\oplus + h$$
+
+**Orbital period**
+
+From Kepler's third law for a circular orbit:
+
+$$T = 2\pi\sqrt{\frac{r^3}{\mu_\oplus}}$$
+
+**Mean motion**
+
+$$n = \frac{2\pi}{T}$$
+
+$n$ is the constant angular rate at which the satellite sweeps its orbit.
+It enters the position calculation in section 3.2 as $\nu(t) = \nu_0 + n \cdot t$.
